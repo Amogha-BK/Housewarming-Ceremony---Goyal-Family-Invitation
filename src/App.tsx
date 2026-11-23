@@ -346,16 +346,6 @@ export default function App() {
           <p className="programme-date">
             <time dateTime="2026-12-03">{config.date}</time>
           </p>
-          <ul className="programme-schedule">
-            {config.programme.map((event) => (
-              <li key={event.id}>
-                <a className="focus-ring" href={`#${event.id}`}>
-                  <span>{event.title}</span>
-                  <span className="programme-time">{event.time}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
           <div className="events goyal-programme">
             {config.programme.map((event) => (
               <EventCard key={event.id} event={event} />

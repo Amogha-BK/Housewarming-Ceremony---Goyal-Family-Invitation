@@ -2147,39 +2147,6 @@ footer {
   color: var(--taupe);
   text-align: center;
 }
-.programme-schedule {
-  width: min(100%, 29rem);
-  margin: 1.5rem auto 0;
-  border-block: 1px solid var(--gold-light);
-}
-.programme-schedule a {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 0.75rem;
-  min-height: 48px;
-  align-content: center;
-  padding: 0.65rem 0.4rem;
-  color: var(--taupe);
-  font-family: var(--font-display);
-  font-size: clamp(1.2rem, 5vw, 1.6rem);
-  font-weight: 600;
-  line-height: 1.2;
-}
-.programme-schedule li + li {
-  border-top: 1px solid rgb(184 154 103 / 0.3);
-}
-.programme-schedule a:hover span:first-child {
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-.programme-time {
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
 .goyal-programme {
   margin-bottom: clamp(2rem, 7vw, 3rem);
 }
