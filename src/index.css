@@ -2159,3 +2159,157 @@ footer {
     animation: none;
   }
 }
+
+/* Goyal family invitation */
+.goyal-opening {
+  min-height: clamp(34rem, 88svh, 62rem);
+}
+.invocation-symbols {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.2rem, 6vw, 2.5rem);
+  color: #88642f;
+  font-family: "Nirmala UI", Georgia, serif;
+  font-size: clamp(1.75rem, 7vw, 2.8rem);
+  line-height: 1;
+}
+.invocation-swastik {
+  font-size: 0.75em;
+}
+.invocation-title {
+  margin-top: 1.25rem;
+  color: #654926;
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 8vw, 4.25rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+.goyal-blessings p {
+  margin: 1rem 0 0;
+}
+.goyal-blessings .script-accent {
+  margin-top: 0.5rem;
+}
+.goyal-blessings small {
+  font-size: 0.65em;
+}
+.goyal-invite {
+  min-height: auto;
+  padding-block: clamp(3.5rem, 9vw, 5.5rem);
+}
+.goyal-invite .hero-invite-line {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+}
+.family-relation {
+  margin-top: 0.35rem;
+  color: var(--taupe);
+  font-size: 0.875rem;
+  text-wrap: balance;
+}
+.invite-of {
+  margin: 0.6rem 0 0.25rem;
+  color: var(--taupe);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-style: italic;
+}
+.house-photo-space {
+  aspect-ratio: 1260 / 583;
+  border: 1px solid var(--gold-light);
+  background: var(--ivory);
+}
+.programme-date {
+  margin-top: 1rem;
+  color: var(--taupe);
+  text-align: center;
+}
+.programme-schedule {
+  width: min(100%, 29rem);
+  margin: 1.5rem auto 0;
+  border-block: 1px solid var(--gold-light);
+}
+.programme-schedule li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.55rem 0.25rem;
+}
+.programme-schedule li + li {
+  border-top: 1px solid rgb(184 154 103 / 0.3);
+}
+.programme-schedule a {
+  color: var(--taupe);
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 5vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.programme-schedule a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.programme-schedule li > span {
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+.goyal-programme {
+  margin-bottom: clamp(2rem, 7vw, 3rem);
+}
+.goyal-programme .event-poster .event-content {
+  top: 28cqi;
+}
+.goyal-programme .event-poster h3 {
+  margin-top: 0;
+}
+.goyal-programme .event-details {
+  margin-top: 4cqi;
+  padding-block: 2.5cqi;
+}
+.goyal-welcome {
+  min-height: auto;
+}
+.goyal-welcome .goyal-presence {
+  margin: 0 0 1.25rem;
+  color: var(--taupe);
+  font-size: clamp(1.25rem, 4.5vw, 2rem);
+  font-style: italic;
+}
+.welcome-names {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: clamp(1.25rem, 6vw, 3rem);
+  margin-top: 1.5rem;
+  color: var(--taupe);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 5vw, 2rem);
+}
+#compliments .welcome-names {
+  flex-direction: column;
+}
+#contact {
+  padding-bottom: 6rem;
+}
+#contact .contact-links {
+  margin-top: 0;
+}
+#contact .save-date-button {
+  margin-top: 0.75rem;
+}
+#contact .countdown-label {
+  margin-top: 0;
+}
+
+@media (min-width: 600px) {
+  .goyal-programme {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .goyal-programme > :last-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - 2rem) / 2);
+  }
+}

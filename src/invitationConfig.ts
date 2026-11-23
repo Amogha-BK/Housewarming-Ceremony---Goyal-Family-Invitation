@@ -1,80 +1,57 @@
-export type Celebration = {
-  id: "havan" | "sundar-kaand" | "lunch";
-  shortName: string;
-  title: string;
-  subtitle: string;
-  dateLabel: string;
-  timeLabel: string;
-  venue: string;
-  supportingLine: string;
-  start: string;
-  image: string;
-  imageAlt: string;
-  scene: string;
-  mapUrl: string;
-};
+export const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
 
-const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
-const address = "Street Adjoining Karuna Hospital, Patiala By Pass Road, Sangrur";
-// Exact pin resolved from the host's original Maps link; opens in the app or browser.
-const venueMap = "https://www.google.com/maps/search/?api=1&query=30.2490584%2C75.8614627";
+const venueName = "ANANTA 11";
+const address = "Country Home Extension, Samrala Road, Khanna";
+const mapQuery = encodeURIComponent(`${venueName}, ${address}`);
+
 export const invitationConfig = {
-  weddingLabel: "Saturday, 28 November 2026",
-  invitationLine: "A new home, a new beginning — made beautiful by your blessings and presence.",
-  monogram: asset("mittal-crest.svg"),
-  houseImage: asset("mittal-house.jpeg"),
-  venue: { name: "The Mittal Residence Sangrur", address, mapUrl: venueMap },
-  celebrations: [
+  date: "Thursday, 3 December 2026",
+  dateShort: "3 December 2026",
+  dateTime: "2026-12-03T08:30:00+05:30",
+  venue: {
+    name: venueName,
+    address,
+    mapUrl: `https://www.google.com/maps/search/?api=1&query=${mapQuery}`,
+    qr: asset("goyal-venue-qr.svg"),
+  },
+  programme: [
     {
-      id: "havan",
-      shortName: "Havan",
-      title: "Havan",
-      subtitle: "A Sacred Beginning",
-      dateLabel: "Saturday, 28 November 2026",
-      timeLabel: "07.15 AM",
-      venue: address,
-      supportingLine:
-        "With the sacred flame, we welcome peace, prosperity and divine blessings into our new home.",
-      start: "20261128T071500",
-      image: asset("housewarming-havan-v2.png"),
-      imageAlt:
-        "A housewarming Havan fire with a coconut kalash, mango leaves and a traditional puja thali in a sunlit home courtyard",
-      scene: "fire",
-      mapUrl: venueMap,
+      id: "grah-pravesh",
+      title: "Grah Pravesh",
+      subtitle: "The First Steps into Our New Home",
+      time: "8:30 a.m.",
+      image: asset("goyal-grah-pravesh.jpg"),
     },
     {
-      id: "sundar-kaand",
-      shortName: "Paath Shri Sundar Kaand",
-      title: "Paath Shri Sundar Kaand",
-      subtitle: "An Offering of Devotion",
-      dateLabel: "Saturday, 28 November 2026",
-      timeLabel: "10.00 AM",
-      venue: address,
-      supportingLine:
-        "Together in devotion, we seek the blessings of Lord Hanuman for a home filled with strength, harmony and happiness.",
-      start: "20261128T100000",
-      image: asset("housewarming-sundar-kaand-v2.png"),
-      imageAlt:
-        "An open sacred scripture on a wooden rehal, a diya, jasmine garland and saffron Hanuman flag in a home prayer nook",
-      scene: "devotion",
-      mapUrl: venueMap,
+      id: "breakfast",
+      title: "Breakfast",
+      subtitle: "A Warm Start to the Morning",
+      time: "9:00 a.m.",
+      image: asset("goyal-breakfast.jpg"),
+    },
+    {
+      id: "havan",
+      title: "Havan",
+      subtitle: "Blessings by the Sacred Fire",
+      time: "10:00 a.m.",
+      image: asset("goyal-havan.jpg"),
     },
     {
       id: "lunch",
-      shortName: "Lunch",
       title: "Lunch",
-      subtitle: "A Feast of Togetherness",
-      dateLabel: "Saturday, 28 November 2026",
-      timeLabel: "12.30 PM",
-      venue: address,
-      supportingLine:
-        "After the prayers, join us for a lovingly hosted lunch and the joy of being together.",
-      start: "20261128T123000",
-      image: asset("housewarming-lunch-v2.png"),
-      imageAlt:
-        "Two vegetarian brass thalis on a welcoming home dining table with ivory flowers and warm afternoon light",
-      scene: "lunch",
-      mapUrl: venueMap,
+      subtitle: "A Meal Shared with Loved Ones",
+      time: "12:30 p.m.",
+      image: asset("goyal-lunch.jpg"),
     },
-  ] satisfies Celebration[],
+    {
+      id: "kirtan",
+      title: "Hari Naam Kirtan",
+      subtitle: "Singing Together in Devotion",
+      time: "2:00 p.m.",
+      image: asset("goyal-kirtan.jpg"),
+    },
+  ],
+  contacts: ["99883-06789", "75084-56789"],
 } as const;
+
+export type Celebration = (typeof invitationConfig.programme)[number];

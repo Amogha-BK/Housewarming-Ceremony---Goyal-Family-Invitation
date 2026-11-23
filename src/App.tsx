@@ -1,20 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ArrowDown, CalendarDays, MapPin, Menu, Pause, Phone, Music2, X } from "lucide-react";
 import { motion } from "motion/react";
-import { Celebration, invitationConfig as config } from "./invitationConfig";
+import { asset, invitationConfig as config, type Celebration } from "./invitationConfig";
 
 const navItems = [
-  ["Invitation", "home"],
-  ["Celebrations", "celebrations"],
+  ["Invitation", "invitation"],
+  ["Programme", "celebrations"],
   ["Venue", "venue"],
+  ["Contact", "contact"],
 ] as const;
-
-function Monogram({ className = "" }: { className?: string }) {
-  return (
-    <img className={`monogram ${className}`} src={config.monogram} alt="Mittal family monogram" />
-  );
-}
 
 function MusicControl() {
   const audio = useRef<HTMLAudioElement>(null);
@@ -144,7 +139,7 @@ function Navigation() {
   return (
     <nav className="site-nav" aria-label="Invitation navigation">
       <a className="nav-mark focus-ring" href="#home" aria-label="Home">
-        M <span>·</span> M
+        G <span>·</span> G
       </a>
       <div className={`nav-links ${open ? "nav-links-open" : ""}`}>
         {navItems.map(([label, id]) => (
@@ -166,33 +161,16 @@ function Navigation() {
   );
 }
 
-function localEventToDate(value: string) {
-  const match = value.match(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/);
-  if (!match) return new Date();
-  const [, y, m, d, h, min, s] = match;
-  return new Date(`${y}-${m}-${d}T${h}:${min}:${s}+05:30`);
-}
-
 function Countdown() {
-  const target = useMemo(() => {
-    const wedding = config.celebrations.find((event) => event.id === "havan");
-    return wedding ? { ...wedding, timestamp: localEventToDate(wedding.start).getTime() } : null;
-  }, []);
-  const [remaining, setRemaining] = useState(() =>
-    target ? Math.max(0, target.timestamp - Date.now()) : 0,
-  );
+  const target = Date.parse(config.dateTime);
+  const [remaining, setRemaining] = useState(() => Math.max(0, target - Date.now()));
 
   useEffect(() => {
-    if (!target) return;
-    const timer = window.setInterval(
-      () => setRemaining(Math.max(0, target.timestamp - Date.now())),
-      1000,
-    );
+    const timer = window.setInterval(() => setRemaining(Math.max(0, target - Date.now())), 1000);
     return () => window.clearInterval(timer);
   }, [target]);
 
-  if (!target || remaining === 0)
-    return <p className="countdown-complete">Our housewarming day is here.</p>;
+  if (remaining === 0) return null;
   const values = [
     ["Days", Math.floor(remaining / 86400000)],
     ["Hours", Math.floor((remaining / 3600000) % 24)],
@@ -214,12 +192,11 @@ function Countdown() {
   );
 }
 
-function SectionHeading({ eyebrow, children }: { eyebrow?: string; children: React.ReactNode }) {
+function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
     <div className="section-heading">
-      {eyebrow && <span>{eyebrow}</span>}
       <h2>{children}</h2>
-      <div className="botanical-rule">
+      <div className="botanical-rule" aria-hidden="true">
         <i />
         <b>◆</b>
         <i />
@@ -232,29 +209,21 @@ function EventCard({ event, index }: { event: Celebration; index: number }) {
   return (
     <motion.article
       id={event.id}
-      className={`event-card event-chapter scene-${event.scene}`}
+      className="event-card event-chapter"
       initial={{ opacity: 0, y: 36 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.8, delay: index * 0.08 }}
     >
       <div className="event-poster">
-        <img className="event-artwork" src={event.image} alt={event.imageAlt} loading="lazy" />
+        <img className="event-artwork" src={event.image} alt="" loading="lazy" />
         <div className="event-content">
-          <Monogram className="event-monogram" />
-          {event.id === "lunch" && <p className="event-followed-by">Followed by</p>}
           <h3>{event.title}</h3>
           <p className="event-line">{event.subtitle}</p>
           <div className="event-details">
-            <span>
-              At <strong>{event.timeLabel}</strong>
-            </span>
+            <strong>{event.time}</strong>
           </div>
         </div>
-      </div>
-      <div className="event-venue-panel">
-        <h4>{config.venue.name}</h4>
-        <p className="event-closing-line">{event.supportingLine}</p>
       </div>
     </motion.article>
   );
@@ -262,32 +231,40 @@ function EventCard({ event, index }: { event: Celebration; index: number }) {
 
 function SaveDate() {
   function download() {
+    const toCalendarTime = (date: Date) => date.toISOString().replace(/[-:]|\.\d{3}/g, "");
+    const description = config.programme.map(({ title, time }) => `${title} ${time}`).join("\\n");
     const lines = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//Mittal Family//Housewarming//EN",
+      "PRODID:-//Goyal Family//Housewarming//EN",
       "BEGIN:VEVENT",
-      "UID:mittal-housewarming-20261128@invitation.local",
-      "DTSTAMP:20261116T000000Z",
-      "DTSTART:20261128T014500Z",
-      "SUMMARY:Mittal Family House Warming Ceremony",
-      `LOCATION:${config.venue.address.replace(/,/g, "\\,")}`,
-      "DESCRIPTION:Havan 07.15 AM; Paath Shri Sundar Kaand 10.00 AM; Lunch 12.30 PM. All timings IST.",
+      "UID:goyal-housewarming-20261203@invitation.local",
+      `DTSTAMP:${toCalendarTime(new Date())}`,
+      `DTSTART:${toCalendarTime(new Date(config.dateTime))}`,
+      "SUMMARY:Goyal Family House Warming Ceremony",
+      `LOCATION:${`${config.venue.name}, ${config.venue.address}`.replace(/,/g, "\\,")}`,
+      `DESCRIPTION:${description}\\nAll timings IST.`,
       "END:VEVENT",
       "END:VCALENDAR",
     ];
+    const calendar = lines
+      .flatMap((line) => [
+        line.slice(0, 75),
+        ...(line.slice(75).match(/.{1,74}/g) ?? []).map((chunk) => ` ${chunk}`),
+      ])
+      .join("\r\n");
     const url = URL.createObjectURL(
-      new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" }),
+      new Blob([`${calendar}\r\n`], { type: "text/calendar;charset=utf-8" }),
     );
     const link = document.createElement("a");
     link.href = url;
-    link.download = "Mittal-Housewarming-28-November-2026.ics";
+    link.download = "Goyal-Housewarming-3-December-2026.ics";
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   return (
     <button className="button button-outline focus-ring save-date-button" onClick={download}>
-      <CalendarDays /> Save the date · 28 November 2026
+      <CalendarDays /> {config.dateShort}
     </button>
   );
 }
@@ -298,77 +275,87 @@ export default function App() {
       <Navigation />
       <MusicControl />
       <main>
-        <section className="hero housewarming-hero" id="home">
+        <section className="hero housewarming-hero goyal-opening" id="home" aria-label="Invocation">
           <div className="paper-grain" />
           <div className="hero-inner">
-            <Monogram className="hero-monogram" />
-            <p className="ganesh-line">॥ श्री गणेशाय नमः ॥</p>
-            <p className="hero-blessings">
-              With the heavenly blessings of
-              <br />
-              <strong>Late Sh. Hari Chand Mittal</strong>
-            </p>
-            <p className="host-name">Smt. Madhu Mittal</p>
-            <p className="hero-invite-line">Cordially invites you to celebrate our</p>
-            <h1>
-              House Warming
-              <br />
-              Ceremony
-            </h1>
-            <div className="hero-date">Saturday, 28 November 2026</div>
-            <figure className="house-photo-frame">
-              <img
-                src={config.houseImage}
-                alt="The Mittal family's new home, with ivory arches, palm trees and ornate entrance gates"
-                fetchPriority="high"
-              />
-              <figcaption>Our new home, blessed by your presence.</figcaption>
-            </figure>
-            <a className="hero-scroll-highlight focus-ring" href="#celebrations">
+            <div className="invocation-symbols" aria-hidden="true">
+              <span>ॐ</span>
+              <span className="invocation-swastik">卐</span>
+              <span>ॐ</span>
+            </div>
+            <p className="invocation-title">Shree Ganeshay Namah</p>
+            <a className="hero-scroll-highlight focus-ring" href="#blessings">
               <span>
-                Scroll down<strong>Explore the celebrations</strong>
+                <strong>View invitation</strong>
               </span>
               <ArrowDown aria-hidden="true" />
             </a>
           </div>
           <div className="hero-artwork" aria-hidden="true">
-            <img
-              src={`${import.meta.env.BASE_URL}assets/housewarming-opening-v2.png`}
-              alt=""
-              fetchPriority="high"
-            />
+            <img src={asset("housewarming-opening-v2.png")} alt="" fetchPriority="high" />
           </div>
         </section>
 
-        <section className="family-section" id="invitation">
+        <section className="family-section goyal-blessings" id="blessings">
           <div className="edge-flower edge-flower-left" aria-hidden="true" />
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-          >
-            <span className="script-accent">A beautiful new beginning</span>
-            <p>{config.invitationLine}</p>
-            <span className="presence-line">Awaiting Your Gracious Presence</span>
-            <Monogram />
-          </motion.div>
+          <div>
+            <SectionHeading>With the Divine Blessings of</SectionHeading>
+            <p>Shreeji &amp; Thakurji</p>
+            <span className="script-accent" aria-hidden="true">
+              &amp;
+            </span>
+            <p>
+              Dr. Deepak Acharya ji
+              <br />
+              <small>(Mohali)</small>
+            </p>
+          </div>
         </section>
 
-        <section className="countdown-section">
-          <SectionHeading eyebrow="Until we celebrate">
-            Counting down to our new beginning
-          </SectionHeading>
-          <Countdown />
-          <SaveDate />
+        <section className="hero housewarming-hero goyal-invite" id="invitation">
+          <div className="hero-inner">
+            <p className="host-name">Smt. Yogita Rani</p>
+            <p className="family-relation">(W/o Late Sh. Madan Lal Goyal)</p>
+            <p className="hero-invite-line">Cordially invites you to celebrate the</p>
+            <h1>
+              House Warming
+              <br />
+              Ceremony
+            </h1>
+            <p className="invite-of">of</p>
+            <p className="host-name">Gaurav Goyal &amp; Kashish Goyal</p>
+            <p className="family-relation">
+              (D/o Late Sh. Ashok Singhania &amp; Late Smt. Ritu Singhania)
+            </p>
+            <div className="house-photo-frame" aria-hidden="true">
+              <div className="house-photo-space" />
+            </div>
+            <a className="hero-scroll-highlight focus-ring" href="#celebrations">
+              <span>
+                <strong>View programme</strong>
+              </span>
+              <ArrowDown aria-hidden="true" />
+            </a>
+          </div>
         </section>
 
         <section className="celebrations-section" id="celebrations">
-          <Monogram className="celebrations-monogram" />
-          <SectionHeading eyebrow="Saturday, 28 November 2026">
-            Prayers, blessings & togetherness
-          </SectionHeading>
-          <div className="events">
-            {config.celebrations.map((event, index) => (
+          <SectionHeading>Programme</SectionHeading>
+          <p className="programme-date">
+            <time dateTime="2026-12-03">{config.date}</time>
+          </p>
+          <ul className="programme-schedule">
+            {config.programme.map((event) => (
+              <li key={event.id}>
+                <a className="focus-ring" href={`#${event.id}`}>
+                  {event.title}
+                </a>
+                <span>{event.time}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="events goyal-programme">
+            {config.programme.map((event, index) => (
               <EventCard key={event.id} event={event} index={index} />
             ))}
           </div>
@@ -376,32 +363,21 @@ export default function App() {
 
         <section className="venue-section housewarming-venue" id="venue">
           <div className="venue-content">
-            <SectionHeading eyebrow="Where we gather">Our new home</SectionHeading>
-            <MapPin className="venue-pin" />
+            <SectionHeading>Venue</SectionHeading>
+            <MapPin className="venue-pin" aria-hidden="true" />
             <h3>{config.venue.name}</h3>
-            <p>
-              Street Adjoining Karuna Hospital
-              <br />
-              Patiala By Pass Road, Sangrur
-            </p>
+            <p>{config.venue.address}</p>
             <figure className="venue-qr">
               <a
                 className="venue-qr-link focus-ring"
                 href={config.venue.mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Open ${config.venue.name} in Google Maps`}
+                aria-label={`Find ${config.venue.name} in Google Maps`}
               >
                 <span className="venue-qr-title">Scan for location</span>
-                <img
-                  src={`${import.meta.env.BASE_URL}assets/house-location-qr.svg`}
-                  alt={`Google Maps location QR code for ${config.venue.name}`}
-                  width={256}
-                  height={256}
-                  loading="lazy"
-                />
+                <img src={config.venue.qr} alt="" width={256} height={256} loading="lazy" />
               </a>
-              <figcaption>Scan with your camera, or tap the code to open Maps.</figcaption>
             </figure>
             <a
               className="button button-outline focus-ring venue-map-button"
@@ -409,74 +385,45 @@ export default function App() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <MapPin /> Open in Google Maps
+              <MapPin aria-hidden="true" /> Open in Google Maps
             </a>
           </div>
         </section>
 
-        <section className="family-acknowledgements" id="family">
-          <span className="script-accent">Warm Welcome</span>
-          <h2>Priyanka & Shanky Mittal</h2>
-          <div className="botanical-rule">
-            <i />
-            <b>◆</b>
-            <i />
-          </div>
-          <div className="family-names">
-            <span className="eyebrow underlined-heading">RSVP</span>
-            <p>
-              Late Sh. Ved Parkash & Raj Rani Mittal
-              <br />
-              Sourabh Mittal & Babita Mittal
-              <br />
-              Gaurav Mittal & Surbhi Mittal
-            </p>
-          </div>
-          <div className="family-names">
-            <span className="eyebrow underlined-heading">With Best Compliments From</span>
-            <p>
-              Nishi Gupta & Aayush Rai Gupta
-              <br />
-              Ridhi Garg & Rohit Garg
-            </p>
-          </div>
-          <div className="family-names">
-            <span className="script-accent">Family’s Flowers</span>
-            <p>
-              Arnav Mittal, Divam Garg
-              <br />
-              Vrishti, Sumedha, Divyanshi, Vanika & Ashita
-            </p>
-          </div>
-          <div className="family-names">
-            <span className="eyebrow underlined-heading">Contact Details</span>
-            <div className="contact-links">
-              <a href="tel:+919876350255">
-                <Phone />
-                98763-50255
-              </a>
-              <a href="tel:+919888854567">
-                <Phone />
-                98888-54567
-              </a>
-            </div>
+        <section className="family-section goyal-welcome" id="family">
+          <div>
+            <p className="goyal-presence">Awaiting Your Gracious Presence</p>
+            <SectionHeading>Warm Welcome</SectionHeading>
+            <ul className="welcome-names">
+              <li>Jayesha Goyal</li>
+              <li>Harisha Goyal</li>
+            </ul>
           </div>
         </section>
-        <footer>
-          <div className="closing-copy">
-            <Monogram />
-            <span>With love & blessings,</span>
-            <p className="closing-message">
-              The Mittal family looks forward to welcoming you to our home and sharing this
-              beautiful beginning together.
-            </p>
-            <div className="closing-rule" aria-hidden="true" />
-            <p>
-              Save the Date
-              <br />
-              28 November 2026
-            </p>
+
+        <section className="family-acknowledgements" id="compliments">
+          <SectionHeading>With Best Compliments From</SectionHeading>
+          <ul className="welcome-names">
+            <li>Goyal Family</li>
+            <li>Gupta Family</li>
+          </ul>
+        </section>
+
+        <footer id="contact">
+          <SectionHeading>Contact Details</SectionHeading>
+          <div className="contact-links">
+            {config.contacts.map((number) => (
+              <a key={number} className="focus-ring" href={`tel:+91${number.replace("-", "")}`}>
+                <Phone aria-hidden="true" />
+                {number}
+              </a>
+            ))}
           </div>
+          <div className="closing-copy">
+            <h3 className="script-accent">Save the Date</h3>
+            <SaveDate />
+          </div>
+          <Countdown />
         </footer>
       </main>
     </div>
