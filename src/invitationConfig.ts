@@ -12,7 +12,6 @@ export const invitationConfig = {
     name: venueName,
     address,
     mapUrl: `https://www.google.com/maps/search/?api=1&query=${mapQuery}`,
-    qr: asset("goyal-venue-qr.svg"),
   },
   programme: [
     {

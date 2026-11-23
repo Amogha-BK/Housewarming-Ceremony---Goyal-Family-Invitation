@@ -367,18 +367,6 @@ export default function App() {
             <MapPin className="venue-pin" aria-hidden="true" />
             <h3>{config.venue.name}</h3>
             <p>{config.venue.address}</p>
-            <figure className="venue-qr">
-              <a
-                className="venue-qr-link focus-ring"
-                href={config.venue.mapUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Find ${config.venue.name} in Google Maps`}
-              >
-                <span className="venue-qr-title">Scan for location</span>
-                <img src={config.venue.qr} alt="" width={256} height={256} loading="lazy" />
-              </a>
-            </figure>
             <a
               className="button button-outline focus-ring venue-map-button"
               href={config.venue.mapUrl}
