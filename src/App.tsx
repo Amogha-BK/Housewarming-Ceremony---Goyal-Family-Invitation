@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import { ArrowDown, CalendarDays, MapPin, Menu, Pause, Phone, Music2, X } from "lucide-react";
-import { motion } from "motion/react";
 import { asset, invitationConfig as config, type Celebration } from "./invitationConfig";
 
 const navItems = [
@@ -115,16 +114,7 @@ function MusicControl() {
         title="Krishna bhajan background music"
       >
         <span className="music-icon">{playing ? <Pause size={16} /> : <Music2 size={16} />}</span>
-        <span>
-          {playing ? "Pause music" : "Background music"}
-          <small>Krishna bhajan</small>
-        </span>
-        <span className="sound-bars" aria-hidden="true">
-          <i />
-          <i />
-          <i />
-          <i />
-        </span>
+        <span>Music</span>
       </button>
       {error && (
         <span className="music-error" role="status">
@@ -137,22 +127,38 @@ function MusicControl() {
 function Navigation() {
   const [open, setOpen] = useState(false);
   return (
-    <nav className="site-nav" aria-label="Invitation navigation">
-      <a className="nav-mark focus-ring" href="#home" aria-label="Home">
+    <nav
+      className="site-nav"
+      aria-label="Invitation navigation"
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && open) {
+          setOpen(false);
+          event.currentTarget.querySelector<HTMLButtonElement>(".nav-toggle")?.focus();
+        }
+      }}
+    >
+      <a
+        className="nav-mark focus-ring"
+        href="#home"
+        aria-label="Home"
+        onClick={() => setOpen(false)}
+      >
         G <span>·</span> G
       </a>
-      <div className={`nav-links ${open ? "nav-links-open" : ""}`}>
+      <div id="invitation-navigation" className={`nav-links ${open ? "nav-links-open" : ""}`}>
         {navItems.map(([label, id]) => (
           <a key={id} className="focus-ring" href={`#${id}`} onClick={() => setOpen(false)}>
             {label}
           </a>
         ))}
       </div>
+      <MusicControl />
       <button
         className="nav-toggle focus-ring"
         type="button"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
+        aria-controls="invitation-navigation"
         aria-label="Toggle navigation"
       >
         {open ? <X /> : <Menu />}
@@ -205,16 +211,9 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
-function EventCard({ event, index }: { event: Celebration; index: number }) {
+function EventCard({ event }: { event: Celebration }) {
   return (
-    <motion.article
-      id={event.id}
-      className="event-card event-chapter"
-      initial={{ opacity: 0, y: 36 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.8, delay: index * 0.08 }}
-    >
+    <article id={event.id} className="event-card event-chapter">
       <div className="event-poster">
         <img className="event-artwork" src={event.image} alt="" loading="lazy" />
         <div className="event-content">
@@ -225,7 +224,7 @@ function EventCard({ event, index }: { event: Celebration; index: number }) {
           </div>
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }
 
@@ -273,7 +272,6 @@ export default function App() {
   return (
     <div className="invitation">
       <Navigation />
-      <MusicControl />
       <main>
         <section className="hero housewarming-hero goyal-opening" id="home" aria-label="Invocation">
           <div className="paper-grain" />
@@ -323,7 +321,11 @@ export default function App() {
               Ceremony
             </h1>
             <p className="invite-of">of</p>
-            <p className="host-name">Gaurav Goyal &amp; Kashish Goyal</p>
+            <p className="host-name couple-names">
+              <span>Gaurav Goyal</span>
+              <span className="couple-ampersand">&amp;</span>
+              <span>Kashish Goyal</span>
+            </p>
             <p className="family-relation">
               (D/o Late Sh. Ashok Singhania &amp; Late Smt. Ritu Singhania)
             </p>
@@ -348,15 +350,15 @@ export default function App() {
             {config.programme.map((event) => (
               <li key={event.id}>
                 <a className="focus-ring" href={`#${event.id}`}>
-                  {event.title}
+                  <span>{event.title}</span>
+                  <span className="programme-time">{event.time}</span>
                 </a>
-                <span>{event.time}</span>
               </li>
             ))}
           </ul>
           <div className="events goyal-programme">
-            {config.programme.map((event, index) => (
-              <EventCard key={event.id} event={event} index={index} />
+            {config.programme.map((event) => (
+              <EventCard key={event.id} event={event} />
             ))}
           </div>
         </section>
@@ -366,7 +368,12 @@ export default function App() {
             <SectionHeading>Venue</SectionHeading>
             <MapPin className="venue-pin" aria-hidden="true" />
             <h3>{config.venue.name}</h3>
-            <p>{config.venue.address}</p>
+            <p className="venue-address">
+              {config.venue.locality},{" "}
+              <span>
+                {config.venue.street}, {config.venue.city}
+              </span>
+            </p>
             <a
               className="button button-outline focus-ring venue-map-button"
               href={config.venue.mapUrl}

@@ -1,7 +1,10 @@
 export const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
 
 const venueName = "ANANTA 11";
-const address = "Country Home Extension, Samrala Road, Khanna";
+const locality = "Country Home Extension";
+const street = "Samrala Road";
+const city = "Khanna";
+const address = `${locality}, ${street}, ${city}`;
 const mapQuery = encodeURIComponent(`${venueName}, ${address}`);
 
 export const invitationConfig = {
@@ -10,6 +13,9 @@ export const invitationConfig = {
   dateTime: "2026-12-03T08:30:00+05:30",
   venue: {
     name: venueName,
+    locality,
+    street,
+    city,
     address,
     mapUrl: `https://www.google.com/maps/search/?api=1&query=${mapQuery}`,
   },
